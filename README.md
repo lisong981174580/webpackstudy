@@ -1,6 +1,6 @@
 ## webpack学习
 
-### 什么是webpack
+### 一、什么是webpack
 > Webpack 是当下最热门的前端资源模块化管理和打包工具。它可以将许多松散的模块按照依赖和规则打包成符合生产环境部署的前端资源。还可以将按需加载的模块进行代码分隔，等到实际需要的时候再异步加载。通过 loader 的转换，任何形式的资源都可以视作模块，比如 CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescript、 LESS 等。
 ![交互图](http://webpack.hnz.kim/amWiki/img/what-is-webpack2.png)
 #### Webpack官网
@@ -18,7 +18,7 @@
 * 具有强大的Plugin接口，大多是内部插件，使用起来比较灵活
 * webpack 使用异步 IO 并具有多级缓存。这使得 webpack 很快且在增量编译上更加快
 ------------------------------------------------------------------------------------
-### 使用
+### 二、使用
 #### 安装
 > Webpack基于Nodejs，要确保安装 Node.js，Node.js 自带了软件包管理器 npm，Webpack命令行工具可以通过npm去安装。最新的webpack版本是：4.16.5;
 ####　安装到全局
@@ -198,7 +198,7 @@ $ webpack-cli
 ```
 
 ---------------------------------------------------------------------------------------------
-### Webpack配置文件详解
+### 三、Webpack配置文件详解
 
 Webpack 在执行的时候，除了在命令行传入参数，还可以通过指定的配置文件来执行。默认情况下，会搜索当前目录的 webpack.config.js 文件，这个文件是一个 node.js 模块，返回一个 json 格式的配置信息对象，或者通过 --config 选项来指定配置文件。
 
@@ -565,8 +565,24 @@ module: {
 
 > brew install libpng
 
+#### 文件处理
+file-loader
+> 安装
+```
+npm install --save-dev file-loader
+```
+> 使用
 
-
+```
+module: {
+    rules: [
+        {
+            test:/\.(woff|woff2|svg|ttf|eot)($|\?)/i,
+            loader:'url-loader?limit=500&name=fonts/[name].[ext]'
+        }
+    ]
+}
+```
 
 
 
