@@ -414,3 +414,185 @@ Loaders需要单独安装并且需要在webpack.config.js下的modules关键字�
 | babel-loader |编译下一代JavaScript标准、编译JavaScript扩展(JSX) |  
 | url-loader | 主要用来处理图片 |  
 | file-loader | 文件处理 |  
+
+### CSS与CSS预处理处理
+#### CSS处理
+> css-loader 处理css中路径引用等问题 style-loader 动态把样式写入css
+```
+npm install css-loader style-loader --save-dev
+
+```
+配置示例：
+```
+module: {
+        //加载器配置
+        rules:[
+            //.css 文件使用 style-loader 、 css-loader和postcss-loader来处理
+            { test: /\.css$/, loader: 'style-loader!css-loader!postcss-loader' },
+        ]
+}
+
+```
+#### sass预处理
+sass-loader scss编译器
+```
+npm install sass sass-loader  --save-dev
+```
+配置示例：
+```
+module: {
+        //加载器配置
+        rules:[
+            //.scss 文件使用 style-loader、css-loader、postcss-loader和 sass-loader 来编译处理
+            { test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader!postcss-loader'}
+        ]
+}
+```
+#### less预处理
+less-loader less编译器
+```
+npm install less less-loader  --save-dev
+```
+配置示例：
+
+```
+module: {
+        //加载器配置
+        rules:[
+            //.less 文件使用 less-loader、cssloader、postcss-loader和style-loader来编译
+            { test:/\.less$/, loader: 'style-loader!css-loader!less-loader!postcss-loader'}
+        ]
+}
+
+```
+#### 为CSS3代码自动添加适应不同浏览器的CSS前缀
+
+postcss-loader 为CSS3代码自动添加适应不同浏览器的CSS前缀
+```
+npm install postcss-loader autoprefixer  --save-dev
+```
+使用postcss-loader需要在项目根目录创建postcss.config.js的配置文件：
+```
+# postcss.config.js
+module.exports = {
+    plugins: [
+        require('autoprefixer')
+    ]
+}
+```
+
+#### JavaScript处理
+babel-loader babel官网
+
+> 安装
+```
+// npm一次性安装多个依赖模块，模块之间用空格隔开
+npm install babel-core babel-loader babel-preset-es2015 babel-preset-react --save-dev
+```
+> 使用
+```
+module: {
+  rules: [
+    {
+        test:/\.jsx?$/,
+        exclude:/node_modules/,
+        loader:'babel-loader'
+    }
+  ]
+}
+
+```
+#### 图片处理
+url-loader
+> 安装
+```
+npm install --save-dev url-loadr file-loader
+```
+> 使用
+```
+module: {
+  rules: [
+    {
+      test: /\.(png|jpg|gif|jpeg|bmp)$/,
+      loader: 'url-loader?limit=10000&name=images/[name].[ext]'
+    }
+  ]
+}
+
+```
+对于上面的配置，如果图片资源小于10kb就会转化成 base64 格式的 dataUrl，其他的图片会存放在(相对于output参数的path路径)build/images文件夹下。
+
+#### 压缩图片
+image-webpack-loader是用来压缩图片的一个插件。
+> 安装
+```
+npm install image-webpack-loader --save-dev
+```
+> 使用
+```
+module: {
+  rules: [
+    {
+      test: /\.(png|jpg|gif|jpeg|bmp)$/,
+      loaders: [
+        'url-loader?limit=10000&name=build/images/[name].[ext]',
+        'image-webpack-loader'
+        ]
+    }
+  ]
+}
+```
+> 使用参数
+```
+module: {
+  rules: [
+    {
+      test: /\.(png|jpg|gif|jpeg|bmp)$/,
+      loaders: [
+        'url-loader?limit=10000&name=build/images/[name].[ext]',
+        'image-webpack-loader?{progressive:true, optimizationLevel: 7, interlaced: false, pngquant:{quality: "65-90", speed: 4}}'
+        ]
+    }
+  ]
+}
+```
+
+> 错误
+> 在Mac os版本中，可能会导致缺少libpng依赖性的错误:
+
+> Module build failed: Error: dyld: Library not loaded: /usr/local/opt/libpng/lib/libpng16.16.dylib
+可以通过 homebrew 安装最新版本的libpng来解决:
+
+> brew install libpng
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
