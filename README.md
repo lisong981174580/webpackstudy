@@ -197,14 +197,100 @@ module.exports = {
 $ webpack-cli
 ```
 
+---------------------------------------------------------------------------------------------
+### Webpack配置文件详解
 
+Webpack 在执行的时候，除了在命令行传入参数，还可以通过指定的配置文件来执行。默认情况下，会搜索当前目录的 webpack.config.js 文件，这个文件是一个 node.js 模块，返回一个 json 格式的配置信息对象，或者通过 --config 选项来指定配置文件。
 
+把一个配置对象给webpack ，它就可以干活儿了。根据你用webpack的用法，有两种途径传入这个对象：
 
+#### CLI( 命令行)
 
+如果你用命令行，命令行会读取一个叫webpack.config.js（或者用 –config 选项传入的一个配置文件）的文件。这个文件应该导出一个配置对象，如下：
+```
+module.exports = {
+    // configuration
+};
 
+```
 
+#### node.js API
+如果 你用node.js API，你需要把配置文件作为一个参数，传给webpack。如下：
 
+```
+webpack({
+    // configuration
+}, callback);
 
+```
+### Webpack四个核心概念
 
+从 webpack v4.0.0 开始，可以不用引入一个配置文件。然而，webpack 仍然还是高度可配置的。在开始前你需要先理解四个核心概念：
+
+* 入口(entry) 告诉webpack 应该使用哪个模块，来作为构建其内部依赖图的开始。进入入口起点后，webpack 会找出有哪些模块和库是入口起点（直接和间接）依赖的。
+* 输出(output) 告诉 webpack 在哪里输出它所创建的 bundles，以及如何命名这些文件，默认值为 ./dist。
+* loader Webpack 本身只能处理 JavaScript 模块，如果要处理其他类型的文件，就需要使用 loader 进行转换。
+* 插件(plugins) 是用来拓展Webpack功能的，插件的范围包括，从打包优化和压缩，一直到重新定义环境中的变量。插件接口功能极其强大，可以用来处理各种各样的任务。
+
+### 配置文件格式
+
+webpack.config.js 就是一个普通的 js 文件，符合 commonJS 规范。最后输出一个对象，即:
+
+```
+module.exports = {
+}
+
+```
+### 配置对象的参数
+
+在导出的配置对象中有几个关键的参数：
+
+#### 模式 mode
+
+通过选择 development 或 production 之中的一个，来设置 mode 参数，你可以启用相应模式下的 webpack 内置的优化。
+
+##### 使用
+
+只在配置中提供 mode 选项：
+```
+module.exports = {
+  mode: 'production'
+};
+
+```
+或者从 CLI 参数中传递：
+```
+webpack --mode=production
+
+```
+##### mode说明
+
+mode: development
+```
+// webpack.development.config.js
+module.exports = {
++ mode: 'development'
+- plugins: [
+-   new webpack.NamedModulesPlugin(),
+-   new webpack.DefinePlugin({ "process.env.NODE_ENV": JSON.stringify("development") }),
+- ]
+}
+
+```
+mode: production
+
+```
+// webpack.production.config.js
+module.exports = {
++  mode: 'production',
+-  plugins: [
+-    new UglifyJsPlugin(/* ... */), //css压缩
+-    new webpack.DefinePlugin({ "process.env.NODE_ENV": JSON.stringify("production") }), //设置当前环境
+-    new webpack.optimize.ModuleConcatenationPlugin(),
+-    new webpack.NoEmitOnErrorsPlugin()
+-  ]
+}
+
+```
 
 
