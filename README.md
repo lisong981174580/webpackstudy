@@ -292,5 +292,125 @@ module.exports = {
 }
 
 ```
+### 入口 entry
 
+entry参数定义了打包后的入口文件，有三种写法，每个入口称为一个chunk:
 
+| 类型  | 示例  |  示例|
+| --- | --- | --- | 
+| 字符串  | entry: "./index/index.js"  |  配置模块会被解析为模块，并在启动时加载。chunk名为默认为main， 具体打包文件名视output配置而定。 默认值是 ./src|
+| 数组  | entry: ['./src/mod1.js', [...,] './src/index.js']  | 所有的模块会在启动时 按照配置顺序加载，合并到最后一个模块会被导出。chunk名默认为main|
+| 对象  | entry:{index: '...', login : [...]} | 如果传入Object,则会生成多个入口打包文件key是chunk名，value可以是字符串，也可是数组。|
+
+注意：webpack4中它会默认定义./src/index.js为入口文件。
+
+#### entry参数为字符串
+```
+var path = require('path');
+module.exports = {
+    entry: './src/index.js',
+    output: {
+        path:path.resolve(__dirname,"dist/js/page") ,
+        publicPath: "/output/",
+        filename: "[name].bundle.js"
+    }
+}
+
+```
+#### entry参数为数组
+```
+var path = require('path');
+module.exports = {
+    entry: [
+        'index1.js',
+        'index2.js',
+        .....
+    ],
+    output: {
+        path:path.resolve(__dirname,"dist/js/page") ,
+        publicPath: "/output/",
+        filename: "[name].bundle.js"
+    }
+}
+
+```
+#### entry参数为对象
+```
+var path = require('path');
+module.exports = {
+    entry: {
+        //支持字符串形式
+        page1: "./page1",
+
+        //支持数组形式，将加载数组中的所有模块，但以最后一个模块作为输出
+        page2: ["./entry1", "./entry2"]
+    },
+    output: {
+        path:path.resolve(__dirname,"dist/js/page") ,
+        publicPath: "/output/",
+        filename: "[name].bundle.js"
+    }
+}
+
+```
+
+该段代码最终会生成一个 page1.bundle.js 和 page2.bundle.js，并存放到 ./dist/js/page 文件夹下
+
+### 输出 output
+
+output参数是个对象，定义了输出文件的位置及名字：
+```
+var path = require('path');
+output: {
+        path: path.resolve(__dirname,"dist/js/page"),
+        publicPath: "/output/",
+        filename: "[name].bundle.js"
+    }
+    
+ ```
+ | 参数  | 描述  |
+| --- | --- | --- | 
+| path  | 打包文件存放的绝对路径,默认值 ./dist  |  
+| publicPath  |用于在生产模式下更新内嵌到css、html文件里的url值  |
+| filename  |打包后的文件名|
+
+> 注意：“path”仅仅告诉Webpack结果存储在哪里，然而“publicPath”项则被许多Webpack的插件用于在生产模式下更新内嵌到css、html文件里的url值。
+例如： publicPath:'http://hnz.com',图片在css中引用路径./logo.png 生成后为 http://hnz.com/logo.png
+
+> 注意：当我们在entry中定义构建多个文件时，filename可以对应的更改为[name].js用于定义不同文件构建后的名字。
+
+> 注意：webpack4中它会默认定义./dist/main.js为出口文件。
+
+### 模块 module
+#### Loader介绍
+> Webpack 本身只能处理 JavaScript 模块，如果要处理其他类型的文件，就需要使用 loader 进行转换。
+
+ | type  | url  |
+| --- | --- | --- | 
+| Loaders  | https://doc.webpack-china.org/loaders/ |  
+
+Loader 可以理解为是模块和资源的转换器，它本身是一个函数，接受源文件作为参数，返回转换的结果。这样，我们就可以通过 require 来加载任何类型的模块或文件，比如 CoffeeScript、 JSX、 LESS 或图片。
+
+loader 一般以 xxx-loader 的方式命名，xxx 代表了这个 loader 要做的转换功能，比如 json-loader。
+
+Loaders需要单独安装并且需要在webpack.config.js下的modules关键字下进行配置，Loaders的配置选项包括以下几方面：
+
+ | 参数  | 描述  |
+| --- | --- | --- | 
+| test  | 一个匹配loaders所处理的文件的拓展名的正则表达式（必须） |  
+| loader |loader的名称（必须） |  
+| include/exclude	 |手动添加必须处理的文件（文件夹）或屏蔽不需要处理的文件（文件夹）（可选） |  
+| query |为loaders提供额外的设置选项（可选） |  
+
+#### 常用loader
+
+ | 名称  | 描述  |
+| --- | --- | --- | 
+| css-loader  | 处理css中路径引用等问题 |  
+| style-loader | 动态把样式写入css |  
+| sass-loader |scss编译器 |  
+| less-loader |less编译器 |  
+| postcss-loader |为CSS代码自动添加适应不同浏览器的CSS前缀 |  
+| babel-loader |编译下一代JavaScript标准、编译JavaScript扩展(JSX) |  
+| url-loader | 主要用来处理图片 |  
+| file-loader | 文件处理 |  
