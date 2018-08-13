@@ -583,17 +583,141 @@ module: {
     ]
 }
 ```
+-----------------------------------------------------------------------------
+### 四、插件
+> webpack 有着丰富的插件接口(rich plugin interface)。webpack 自身的多数功能都使用这个插件接口。这个插件接口使 webpack 变得极其灵活。
+
+#### 插件语法
+```
+module.exports = {
+    plugins:[
+
+    ]
+}
+```
+#### 插件分类
+##### Webpack官方提供
+Webpack官方提供的插件，一般需要我们在本地项目中安装webpack:
+```
+npm install webpack --save-dev
+
+# webpack.config.js
+var webpack = require('webpack');
+module.exports = {
+    plugins: [
+        new webpack.BannerPlugin("Copyright Nico inc.")
+    ]
+}
+```
+#### 第三方插件
+
+第三方的插件，需要我们按照插件的要求进行安装与使用：
+
+```
+# 安装
+npm install --save-dev html-webpack-plugin
+
+# webpack.config.js
+module.exports = {
+    new HtmlWebpackPlugin({
+        template: __dirname + "/app/index.tmpl.html"
+    })
+}
+
+```
+
+#### 插件列表
 
 
+ | Name  | Description  |
+| --- | --- |
+| AggressiveSplittingPlugin  | 将原来的 chunk 分成更小的 chunk |  
+| BabelMinifyWebpackPlugin |使用 babel-minify进行压缩 |  
+| BannerPlugin	 |在每个生成的 chunk 顶部添加 banner |  
+| CommonsChunkPlugin|提取 chunks 之间共享的通用模块 |  
+| CompressionWebpackPlugin |预先准备的资源压缩版本，使用 Content-Encoding 提供访问服务 |  
+| ContextReplacementPlugin |重写 require 表达式的推断上下文 |  
+| CopyWebpackPlugin |将单个文件或整个目录复制到构建目录 |  
+| DefinePlugin |允许在编译时(compile time)配置的全局常量 |  
+| DllPlugin |为了极大减少构建时间，进行分离打包 |  
+| EnvironmentPlugin |DefinePlugin 中 process.env 键的简写方式。|  
+| ExtractTextWebpackPlugin |从 bundle 中提取文本（CSS）到单独的文件|  
+| HotModuleReplacementPlugin |启用模块热替换(Enable Hot Module Replacement - HMR)|  
+| HtmlWebpackPlugin |简单创建 HTML 文件，用于服务器访问|  
+| I18nWebpackPlugin |为 bundle 增加国际化支持|  
+| IgnorePlugin |从 bundle 中排除某些模块|  
+| LimitChunkCountPlugin |设置 chunk 的最小/最大限制，以微调和控制 chunk|  
+| LoaderOptionsPlugin |用于从 webpack 1 迁移到 webpack 2|  
+| MinChunkSizePlugin |确保 chunk 大小超过指定限制|  
+| NoEmitOnErrorsPlugin |在输出阶段时，遇到编译错误跳过|  
+| NormalModuleReplacementPlugin |替换与正则表达式匹配的资源|  
+| NpmInstallWebpackPlugin |在开发时自动安装缺少的依赖|  
+| ProvidePlugin |在开发时自动安装缺少的依赖|  
+| UglifyjsWebpackPlugin |可以控制项目中 UglifyJS 的版本|  
+| ZopfliWebpackPlugin |通过 node-zopfli 将资源预先压缩的版本|  
 
+----------------------------------------------------------------------------------------------------------------
+### 五、使用webpack构建本地服务器
+> 想不想让你的浏览器监测你都代码的修改，并自动刷新修改后的结果，其实Webpack提供一个可选的本地开发服务器，这个本地服务器基于node.js构建，可以实现你想要的这些功能，不过它是一个单独的组件，在webpack中进行配置之前需要单独安装它作为项目依赖
+#### 安装
+```
+npm install --save-dev webpack-dev-server
+```
+#### 调用
+```
+webpack-dev-server --progress --colors
+```
+#### 配置
+devserver作为webpack配置选项中的一项，具有以下配置选项
 
+ | devserver配置选项  | 功能描述  |
+| --- | --- |
+| contentBase  | 默认webpack-dev-server会为根文件夹提供本地服务器，如果想为另外一个目录下的文件提供本地服务器，
+应该在这里设置其所在目录（本例设置到“public"目录） |  
+| port |设置默认监听端口，如果省略，默认为”8080“ |  
+| inline	 |设置为true，当源文件改变时会自动刷新页面 |  
+| colors|设置为true，使终端输出的文件为彩色的 ,只能用于CLI |  
+| historyApiFallback |	在开发单页应用时非常有用，它依赖于HTML5 history API，
+如果设置为true，所有的跳转将指向index.html |  
+| proxy |如果你有单独的后端开发服务器 API，并且希望在同域名下发送 API 请求 ，那么代理某些 URL 会很有用。 |  
 
+ 
+ 如下配置：
+ ```
+ module.exports = {
+    ...
+    devServer: {
+        contentBase: "./public",//本地服务器所加载的页面所在的目录
+        colors: true,//终端中输出结果为彩色
+        historyApiFallback: true,//不跳转
+        inline: true//实时刷新
+    }
+}
 
+```
+#### proxy
+如果你有单独的后端开发服务器 API，并且希望在同域名下发送 API 请求 ，那么代理某些 URL 会很有用。
+##### 简单使用
 
+在 localhost:3000 上有后端服务的话，你可以这样启用代理：
 
+```
+proxy: {
+  "/api": "http://localhost:3000"
+}
+```
+请求到 /api/users 现在会被代理到请求 http://localhost:3000/api/users。
 
-
-
+##### 重写路径
+如果你不想始终传递 /api ，则需要重写路径：
+```
+proxy: {
+  "/api": {
+    target: "http://localhost:3000",
+    pathRewrite: {"^/api" : ""}
+  }
+}
+```
 
 
 
