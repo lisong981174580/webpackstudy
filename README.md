@@ -718,6 +718,212 @@ proxy: {
   }
 }
 ```
+----------------------------------------------------------------------------------------------------------
+### 六、Webpack插件
+#### webpack.BannerPlugin
+为每个 chunk 文件头部添加 banner。
+
+##### 参考
+> https://www.webpackjs.com/plugins/banner-plugin/
+##### 使用
+```
+const webpack = require("webpack");
+
+plugins:[
+    new webpack.BannerPlugin(banner)
+    // or
+    new webpack.BannerPlugin(options)
+]
+```
+##### 参数(options)
+```
+{
+  banner: string, // 其值为字符串，将作为注释存在
+  raw: boolean, // 如果值为 true，将直出，不会被作为注释
+  entryOnly: boolean, // 如果值为 true，将只在入口 chunks 文件中添加
+  test: string | RegExp | Array,
+  include: string | RegExp | Array,
+  exclude: string | RegExp | Array,
+}
+```
+##### 占位符(Placeholders)
+从 webpack 2.5.0 开始，会对 banner 字符串中的占位符取值：
+```
+new webpack.BannerPlugin({
+  banner: "hash:[hash], chunkhash:[chunkhash], name:[name], filebase:[filebase], query:[query], file:[file]"
+})
+
+```
+##### 示例
+```
+var webpack = require('webpack');
+module.exports = {
+  plugins: [
+    new webpack.BannerPlugin("Copyright Nico inc.")
+  ]
+}
+
+```
+-----------------------------------------------------------------------------------
+#### webpack.ProvidePlugin
+自动加载模块，而不必到处 import 或 require 。
+
+当我们经常使用React、jQuery等外部第三方库的时候，通常在每个业务逻辑JS中都会遇到这些库。
+
+如我们需要在各个文件中都是有jQuery的$对象，因此我们需要在每个用到jQuery的JS文件的头部通过require('jquery')来依赖jQuery。 这样做非常繁琐且重复，因此webpack提供了我们一种比较高效的方法，我们可以通过在配置文件中配置使用到的变量名，那么webpack会自动分析，并且在编译时帮我们完成这些依赖的引入。
+
+##### 参考
+https://www.webpackjs.com/plugins/provide-plugin/
+
+##### 使用
+```
+new webpack.ProvidePlugin({
+  identifier: 'module1',
+  // ...
+})
+
+new webpack.ProvidePlugin({
+  identifier: ['module1', 'property1'],
+  // ...
+})
+```
+任何时候，当 identifier 被当作未赋值的变量时，module 就会自动被加载，并且 identifier 会被这个 module 输出的内容所赋值。（模块的 property 用于支持命名导出(named export)）
+
+> 对于 ES2015 模块的 default export，你必须指定模块的 default 属性。
+
+##### 示例
+```
+var webpack = require('webpack');
+
+plugins: [
+   new webpack.ProvidePlugin({
+       'Moment': 'moment',
+       "$": "jquery",
+       "jQuery": "jquery",
+       "React": "react",
+       "ReactDOM":"react-dom"
+   })
+]
+
+```
+
+---------------------------------------------------------------------------------------------
+#### optimization.splitChunks
+项目中，对于一些常用的组件，站点公用模块经常需要与其他逻辑分开，然后合并到同一个文件，以便于长时间的缓存。
+
+webpack 4 移除 CommonsChunkPlugin，取而代之的是两个新的配置项（optimization.splitChunks 和 optimization.runtimeChunk），下面介绍一下用法和机制。
+##### 参考
+https://www.webpackjs.com/plugins/split-chunks-plugin/
+
+##### 介绍
+> webpack模式模式现在已经做了一些通用性优化，适用于多数使用者。
+
+##### 默认用法
+
+需要注意的是：默认模式只影响按需(on-demand)加载的代码块(chunk)，因为改变初始代码块会影响声明在HTML的script标签。如果可以处理好这些（比如，从打包状态里面读取并动态生成script标签到HTML），你可以通过设置optimization.splitChunks.chunks: "all"，应用这些优化模式到初始代码块(initial chunk)。
+
+webpack根据下述条件自动进行代码块分割：
+
+*　新代码块可以被共享引用，OR这些模块都是来自node_modules文件夹里面
+×　新代码块大于30kb（min+gziped之前的体积）
+×　按需加载的代码块，最大数量应该小于或者等于5
+×　初始加载的代码块，最大数量应该小于或等于3
+
+为了满足后面两个条件，webpack有可能受限于包的最大数量值，生成的代码体积往上增加。
+```
+module.exports = {
+    entry:'',
+    output:{},
+    module:{},
+    optimization:{
+        splitChunks:{
+            chunks:"all"
+        }
+    }        
+}
+
+```
+
+##### 选项
+```
+optimization:{
+    splitChunks: {
+        chunks: "initial",         // 必须三选一： "initial" | "all"(默认就是all) | "async"
+        minSize: 0,                // 最小尺寸，默认0
+        minChunks: 1,              // 最小 chunk ，默认1
+        maxAsyncRequests: 1,       // 最大异步请求数， 默认1
+        maxInitialRequests: 1,     // 最大初始化请求书，默认1
+        name: () => {},            // 名称，此选项课接收 function
+        cacheGroups: {             // 这里开始设置缓存的 chunks
+            priority: "0",             // 缓存组优先级 false | object |
+            vendor: {                  // key 为entry中定义的 入口名称
+                chunks: "initial",         // 必须三选一： "initial" | "all" | "async"(默认就是异步)
+                test: /react|lodash/,      // 正则规则验证，如果符合就提取 chunk
+                name: "vendor",            // 要缓存的 分隔出来的 chunk 名称
+                minSize: 0,
+                minChunks: 1,
+                enforce: true,
+                maxAsyncRequests: 1,       // 最大异步请求数， 默认1
+                maxInitialRequests: 1,     // 最大初始化请求书，默认1
+                reuseExistingChunk: true   // 可设置是否重用该chunk（查看源码没有发现默认值）
+            }
+        }
+    }
+}
+```
+-------------------------------------------------------------------------------------
+
+### html-webpack-plugin
+html-webpack-plugin可以根据你设置的html模板，在每次运行后生成对应的模板文件，同时所依赖的CSS/JS也都会被引入，如果CSS/JS中含有hash值，则html-webpack-plugin生成的模板文件也会引入正确版本的CSS/JS文件。
+
+ | 插件名称  | 地址  |
+| --- | --- |
+| html-webpack-plugin  | https://www.npmjs.com/package/html-webpack-plugin |  
+
+#### 介绍
+https://www.webpackjs.com/plugins/split-chunks-plugin/
+
+#####  安装（Install）
+```
+npm install --save-dev html-webpack-plugin
+```
+##### 引入
+在webpack.config.js中引入：
+```
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+```
+##### 完整配置
+你可以传一个配置选项到 HtmlWebpackPlugin，允许的值如下：
+
+ | 参数	  | 描述  |
+| --- | --- |
+| title  | 用于生成的HTML文件的标题 |  
+| filename  | 用于生成的HTML文件的名称，默认是index.html。你可以在这里指定子目录（例如:assets/admin.html） |  
+| template  | 模板的路径。支持加载器，例如 html!./index.html |  
+| inject  | rue \ ‘head’ \ ‘body’ \ false 。把所有产出文件注入到给定的 template 或templateContent。当传入 true或者 ‘body’时所有javascript资源将被放置在body元素的底部，“head”则会放在head元素内 |  
+| favicon  | 给定的图标路径，可将其添加到输出html中 |  
+| minify  | {…} \ false 。传一个html-minifier 配置object来压缩输出 |  
+| hash  | true \ false。如果是true，会给所有包含的script和css添加一个唯一的webpack编译hash值。这对于缓存清除非常有用 |  
+| cache  | rue \ false 。如果传入true（默认），只有在文件变化时才 发送（emit）文件 |  
+| showErrors  | true \ false 。如果传入true（默认），错误信息将写入html页面 |  
+| chunks  | 引入的模块，这里指定的是entry中设置多个js时，在这里指定引入的js，如果不设置则默认全部引入 |  
+| chunksSortMode	  | 在chunk被插入到html之前，你可以控制它们的排序。允许的值 ‘none’ \ ‘auto’ \ ‘dependency’ \ {function} 默认为‘auto’. |  
+| excludeChunks	  | 排除的模块 |  
+| xhtml	  | 生成的模板文档中标签是否自动关闭，针对xhtml的语法，会要求标签都关闭，默认false |  
+
+###### title
+title: 生成的html文档的标题。配置该项，它并不会替换指定模板文件中的title元素的内容，除非html模板文件中使用了模板引擎语法来获取该配置项值，如下ejs模板语法形式：
+```
+<title>{%= o.htmlWebpackPlugin.options.title %}</title>
+```
+###### filename
+filename：输出文件的文件名称，默认为index.html，不配置就是该文件名；此外，还可以为输出文件指定目录位置（例如'html/index.html'）
+
+> 1.filename配置的html文件目录是相对于webpackConfig.output.path路径而言的，不是相对于当前项目目录结构的。
+指定生成的html文件内容中的link和script路径是相对于生成目录下的，写路径的时候请写生成目录下的相对路径。
+
+> 2.指定生成的html文件内容中的link和script路径是相对于生成目录下的，写路径的时候请写生成目录下的相对路径。
+
 
 
 
