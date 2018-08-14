@@ -1600,3 +1600,17 @@ module.exports = {
     │     
     └── etc
 
+
+```
+## React加载图片
+### 在React中引入图片
+在react组件里的src：
+```
+<img src={require('../../images/test2.png')} alt=""/>
+```
+在css里的图片引用：
+
+```
+background: url("images/test3.png") 0 0 no-repeat;
+```
+文档来源：http://webpack.hnz.kim/?file=006-%E9%99%84%E5%BD%95/099-WebpackV3.x%E7%A4%BA%E4%BE%8B/09-Webpack%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8
