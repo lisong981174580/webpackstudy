@@ -924,21 +924,87 @@ filename：输出文件的文件名称，默认为index.html，不配置就是�
 
 > 2.指定生成的html文件内容中的link和script路径是相对于生成目录下的，写路径的时候请写生成目录下的相对路径。
 
+###### inject
+inject：向template或者templateContent中注入所有静态资源，不同的配置值注入的位置不经相同。
+> 1.true或者body：所有JavaScript资源插入到body元素的底部
 
+> 2.head: 所有JavaScript资源插入到head元素中
 
+> 3.false： 所有静态资源css和JavaScript都不会注入到模板文件中
 
+###### minify
+minify: 是html-webpack-plugin中集成的 html-minifier ，生成模板文件压缩配置，有很多配置项，
+```
+{
+    caseSensitive: false, //是否大小写敏感
+    collapseBooleanAttributes: true, //是否简写boolean格式的属性如：disabled="disabled" 简写为disabled
+    collapseWhitespace: true //是否去除空格
+}
 
+```
+#### 使用
+##### 基本使用
+在webpack.config.js中引入：
+```
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+```
+在src目录下，创建一个Html文件模板，这个模板包含title等其它你需要的元素，在编译过程中，本插件会依据此模板生成最终的html页面，会自动添加所依赖的 css, js，favicon等文件，在本例中我们命名模板文件名称为index.tmpl.html，模板源代码如下
 
+index.tmpl.html
+```
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Webpack</title>
+  </head>
+  <body>
+    <div id='box'>
+    </div>
+  </body>
+</html>
+```
+webpack.config.js
+```
+var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+module.exports = {
+    plugins: [
+    new HtmlWebpackPlugin({
+      template: __dirname + "/src/index.tmpl.html"//new 一个这个插件的实例，并传入相关的参数
+    })
+  ]
+}
 
+```
+##### 配置多个html页面
+html-webpack-plugin的一个实例生成一个html文件，如果单页应用中需要多个页面入口，或者多页应用时配置多个html时，那么就需要实例化该插件多次；
 
+即有几个页面就需要在webpack的plugins数组中配置几个该插件实例：
 
+```
+plugins: [
+    new HtmlWebpackPlugin({
+        filename: 'index.html',
+        template: 'src/html/index.html',
+        excludeChunks: ['list', 'detail']
+    }),
+    new HtmlWebpackPlugin({
+        filename: 'list.html',
+        template: 'src/html/list.html',
+        thunks: ['common', 'list']
+    }),
+    new HtmlWebpackPlugin({
+        filename: 'detail.html',
+        template: 'src/html/detail.html',
+        thunks: ['common', 'detail']
+    })
+]
 
+```
+> 如上例应用中配置了三个入口页面：index.html、list.html、detail.html；并且每个页面注入的thunk不尽相同；类似如果多页面应用，就需要为每个页面配置一个
 
-
-
-
-
-
+------------------------------------------------------------------------------------------------
 
 
