@@ -1414,9 +1414,130 @@ module.exports = {
 }
 
 ```
+---------------------------------------------------------------------------------------------------
 
+## 生产环境配置
+### 目录结构
 
+```
+/
+ ├── dist/ 自动生成
+ │
+ ├── src/ 开发目录
+ │      ├── components/ 组件
+ │      │
+ │      ├── pages/ 页面
+ │      │
+ │      ├── index.jsx
+ │      │
+ │      └── index.tmpl.html
+ │
+ ├── conf/ 工程配置
+ │
+ ├── test/ 测试
+ │
+ ├── docs/ 项目文档
+ │
+ ├── static/ 库文件等，不会被webpack的loader处理,手动管理
+ │
+ ├── node_modules/ 自动生成，包含.Node 依赖以及开发依赖
+ │
+ ├── package.json 项目配置文件
+ │
+ ├── webpack.config.js Webpack 开发环境配置文件
+ │
+ ├── webpack.production.config.js Webpack生产环境配置文件
+ │
+ └── README.md 项目说明
+ 
+ ```
+### webpack.config.js
+React项目基于webpack生产环境配置示例：
+```
+var webpack = require('webpack');
+var path = require('path');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+module.exports = {
+    entry:'./src/index.jsx',
+    output: {
+        path:path.resolve(__dirname,'dist'),
+        filename: "js/[name].js"
+    },
+    resolve: {
+        extensions: ['.js','.jsx']
+    },
+    module:{
+        rules:[
+            {
+                test:/\.css$/,
+                loader:ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader','postcss-loader'] })
+            },
+            {
+                test:/\.less$/,
+                loader:ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader','less-loader','postcss-loader'] })
+            },
+            {
+                test:/\.jsx?$/,
+                exclude:/node_modules/,
+                loader:"babel-loader"
+            },
+            {
+                test: /\.(png|jpg|gif|jpeg|bmp)$/,
+                loader: ['url-loader?limit=10&name=images/[name].[ext]','image-webpack-loader?{progressive:true, optimizationLevel: 7, interlaced: false, pngquant:{quality: "65-90", speed: 4}}']
+            },
+            {
+                test:/\.(woff|woff2|svg|ttf|eot)($|\?)/i,
+                loader:'url-loader?limit=50&name=fonts/[name].[ext]'
+            }
+        ]
+    },
+    plugins:[
+        new webpack.ProvidePlugin({
+            "React": "react",
+            "ReactDOM":'react-dom'
+        }),
+        new HtmlWebpackPlugin({
+            template:"./src/index.tmpl.html",
+            hash:true,
+            minify:{
+                caseSensitive: false,
+                collapseBooleanAttributes: true,
+                collapseWhitespace: true
+            }
+        }),
+        new ExtractTextPlugin('css/[name].css'),
+        new OptimizeCSSPlugin({
+            cssProcessorOptions: {
+                safe: true
+            }
+        }),
+        new webpack.optimize.OccurrenceOrderPlugin()
+    ],
+    optimization:{
+        splitChunks:{
+            chunks:"all"
+        }
+    }
+}
 
+```
+### postcss.config.js
+```
+module.exports = {
+    plugins: [
+        require('autoprefixer')
+    ]
+}
 
+```
+### .babelrc
+```
+{
+    "presets":["env","react"]
+}
 
+```
+----------------------------------------------------------------------------------
 
