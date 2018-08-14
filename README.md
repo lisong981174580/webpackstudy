@@ -1,5 +1,4 @@
 ## webpack学习
-
 ### 一、什么是webpack
 > Webpack 是当下最热门的前端资源模块化管理和打包工具。它可以将许多松散的模块按照依赖和规则打包成符合生产环境部署的前端资源。还可以将按需加载的模块进行代码分隔，等到实际需要的时候再异步加载。通过 loader 的转换，任何形式的资源都可以视作模块，比如 CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescript、 LESS 等。
 ![交互图](http://webpack.hnz.kim/amWiki/img/what-is-webpack2.png)
@@ -1611,7 +1610,6 @@ module.exports = {
 
 ```
 background: url("images/test3.png") 0 0 no-repeat;
-
-``
-
+```
+文档来源：http://webpack.hnz.kim/?file=006-%E9%99%84%E5%BD%95/099-WebpackV3.x%E7%A4%BA%E4%BE%8B/09-Webpack%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8
 
