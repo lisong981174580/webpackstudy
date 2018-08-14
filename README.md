@@ -1006,5 +1006,295 @@ plugins: [
 > 如上例应用中配置了三个入口页面：index.html、list.html、detail.html；并且每个页面注入的thunk不尽相同；类似如果多页面应用，就需要为每个页面配置一个
 
 ------------------------------------------------------------------------------------------------
+### mini-css-extract-plugin
+> 该插件建立在webpack v4功能（模块类型）之上，需要webpack 4才能正常工作.
+
+此插件将CSS提取到单独的文件中。它为每个包含CSS的JS文件创建一个CSS文件。它支持CSS和SourceMaps的按需加载。
 
 
+ | 插件名称  | 地址  |
+| --- | --- |
+| mini-css-extract-plugin  | https://github.com/webpack-contrib/mini-css-extract-plugin |  
+
+#### 介绍
+##### 安装
+```
+npm install --save-dev mini-css-extract-plugin
+
+```
+##### 引入
+在webpack.config.js中引入：
+```
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+```
+##### 使用
+基本使用
+```
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+module.exports = {
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "[name].css",
+            chunkFilename: "[id].css"
+        })
+    ],
+    module:{
+        rules:[
+        {
+    test: /\.css$/,
+    use: [
+            {
+                loader: MiniCssExtractPlugin.loader,
+                "css-loader"
+            }
+        ]
+    }
+}
+```
+less与css
+```
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+module.exports = {
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "[name]-[hash].css",
+            chunkFilename: "[id]-[hash].css"
+        })
+    ],
+    module:{
+        rules:[
+            {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'postcss-loader',
+                ]
+            },
+            {
+                test: /\.less$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'less-loader',
+                    'postcss-loader',
+                ]
+            }
+        ]
+    }
+}
+```
+生产环境压缩
+
+```
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+
+module.exports = {
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "css/[name].css",
+            chunkFilename: "css/[id].css"
+        }),
+        //通过该插件完成CSS压缩
+        new OptimizeCSSPlugin()
+    ],
+    module:{
+        rules:[
+        {
+    test: /\.css$/,
+    use: [
+            {
+                loader: MiniCssExtractPlugin.loader,
+                "css-loader"
+            }
+        ]
+    }
+}
+```
+---------------------------------------------------------------------------------------------------
+
+### optimize-css-assets-webpack-plugin
+由于Webpack分离出css文件未压缩，因此需要该插件，主要是为了优化、压缩css文件。
+
+ | 插件名称  | 地址  |
+| --- | --- |
+| optimize-css-assets-webpack-plugin  | https://github.com/NMFR/optimize-css-assets-webpack-plugin |  
+
+#### 介绍
+##### 安装
+```
+npm install --save-dev optimize-css-assets-webpack-plugin
+
+```
+##### 引入
+在webpack.config.js中引入：
+```
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+```
+##### 选项
+
+ | 参数  | 	描述  |
+| --- | --- |
+| assetNameRegExp  | 一个正则表达式，指定要优化\最小化的资源的名称。提供的正则表达式针对配置中MiniCssExtractPlugin实例导出的文件的文件名运行，而不是源CSS文件的文件名。默认为/\.css$/g |  
+| cssProcessor  | 用于优化\最小化CSS的CSS处理器，默认为cssnano。|  
+| cssProcessorOptions  | 传递给cssProcessor的选项，默认为 {}|  
+| canPrint  |一个布尔值，指示插件是否可以将消息打印到控制台，默认为 true|  
+
+```
+new  OptimizeCssAssetsPlugin（{
+    assetNameRegExp: /\.optimize\.css$/g,
+    cssProcessor: require('cssnano'),
+    cssProcessorOptions: { discardComments: { removeAll: true } },
+    canPrint: true
+}）
+```
+#### 使用
+基本使用
+```
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+
+module.exports = {
+    plugins:[
+        new MiniCssExtractPlugin({
+          filename: "css/[name].css"
+        }),
+        new OptimizeCSSPlugin()
+    ]
+}
+```
+-----------------------------------------------------
+
+### copy-webpack-plugin
+将单个文件或整个目录复制到构建目录
+
+ | 插件名称  | 	地址  |
+| --- | --- |
+| copy-webpack-plugin | https://github.com/webpack-contrib/copy-webpack-plugin |  
+
+#### 介绍
+安装
+```
+npm install copy-webpack-plugin --save-dev
+```
+引入
+
+```
+const  CopyWebpackPlugin  =  require('copy-webpack-plugin')
+
+module.exports = {
+    plugins: [
+        new CopyWebpackPlugin([ ...patterns ], options)
+    ]
+}
+```
+Patterns
+```
+{ from: 'source', to: 'dest' }
+
+```
+示例
+```
+module.exports = {
+    plugins: [
+        new CopyWebpackPlugin([{
+            from: __dirname + '/src/public'
+        }]);
+        //作用：把public 里面的内容全部拷贝到编译目录
+    ]
+}
+
+```
+-------------------------------------------------------------------------------------
+# WebpackReact
+## package.json配置
+每个项目的根目录下面，一般都有一个package.json文件，定义了这个项目所需要的各种模块，以及项目的配置信息（比如名称、版本、许可证等元数据）。npm install命令根据这个配置文件，自动下载所需的模块，也就是配置项目所需的运行和开发环境。
+### scripts字段
+scripts指定了运行脚本命令的npm命令行缩写，比如start指定了运行npm start时，所要执行的命令。查看以下代码。npm start和npm run build分别是运行代码和打包项目。另外，"start"、"test"可以不用run。
+#### Windows用户
+```
+"scripts": {
+    "start": "webpack-dev-server --progress --colors",
+    "build": "rmdir /s/q build && webpack-cli --config ./webpack.production.config.js --progress --colors"
+},
+
+```
+#### Mac用户
+```
+"scripts": {
+    "start": "webpack-dev-server --progress --colors",
+    "build": "rm -rf ./build && webpack-cli --config webpack.product.config.js --progress --colors"
+},
+
+```
+这两个命令主要有以下区别：
+
+* start命令：默认使用 webpack.config.js 作为配置文件，
+* build命令：强制使用 webpack.production.config.js 作为配置文件
+
+#### 运行开发环境打包配置
+在CLI输入npm start就会执行start对应的命令。
+```
+"scripts": {
+    "start": "webpack-dev-server --progress --colors"
+},
+```
+#### 运行生产环境打包配置
+在CLI输入npm run build就会执行start对应的命令。
+```
+"scripts": {
+    "build": "rm -rf ./build && webpack-cli --config ./webpack.production.config.js --progress --colors"
+},
+
+```
+### dependencies字段与devDependencies字段
+npm install时使用--save和--save-dev，可分别将依赖（插件）记录到package.json中的dependencies和devDependencies下面。
+```
+npm install <包名> --save      #将包添加到dependencies 生产依赖列表
+npm install <包名> --save-dev  #将包添加到devDependencies 开发依赖列表
+
+```
+* dependencies 下记录的是项目在运行时必须依赖的插件，常见的例如react、jquery等，即及时项目打包好了、上线了，这些也是需要用的，否则程序无法正常执行。
+* devDependencies 下记录的是项目在开发过程中使用的插件，例如这里我们开发过程中需要使用webpack打包，但是一旦项目打包发布、上线了之后，webpack就都没有用了，即可不用安装了。
+
+它们都指向一个对象。该对象的各个成员，分别由模块名和对应的版本要求组成，表示依赖的模块及其版本范围。
+
+### 示例
+```
+package.json
+
+"dependencies": {
+    "normalize.css": "^8.0.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-router-dom": "^4.2.2",
+    "react-swipe": "^5.1.1",
+    "swipe-js-iso": "^2.0.4",
+    "whatwg-fetch": "^2.0.3"
+},
+"devDependencies": {
+    "autoprefixer": "^8.1.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.3",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.10",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.0.4",
+    "image-webpack-loader": "^4.1.0",
+    "less": "^3.0.1",
+    "less-loader": "^4.0.6",
+    "open-browser-webpack-plugin": "0.0.5",
+    "optimize-css-assets-webpack-plugin": "^4.0.0",
+    "postcss-loader": "^2.1.1",
+    "style-loader": "^0.20.2",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.1.0"
+}
+```
+--------------------------------------------------------------------
