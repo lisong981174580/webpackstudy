@@ -1540,4 +1540,78 @@ module.exports = {
 
 ```
 ----------------------------------------------------------------------------------
+## 项目目录结构推荐
+### 目录结构
+```
+/
+ ├── shell/ 脚本
+ │
+ ├── conf/ 工程配置
+ │
+ ├── src/ 开发目录
+ │      ├── components/ 组件
+ │      ├── pages/ 页面
+ │      └──
+ ├── dist/ 自动生成
+ │
+ ├── test/ 测试
+ │
+ ├── node_modules/ 自动生成，包含.Node 依赖以及开发依赖
+ │
+ ├── static/ 库文件等，不会被webpack的loader处理,手动管理
+ │
+ └── etc
+ ```
+ 完整的目录结构：
+ ```
+ project/  
+    ├── shell/    node脚本    
+    │    ├──
+    │    ├── dev-server.js  本地开发服务器
+    │    ├── build.js  打包脚本
+    │    └── utils.js  工具函数
+    │          
+    ├── conf/     工程配置  
+    │    ├──
+    │    ├── index.js  基础配置文件，在此可简单的修改webpack相关配置
+    │    ├── webpack.base.js  webpack的基础配置，主要是loader、resolve的配置
+    │    ├── webpack.dev.js  webpack开发配置，主要是eslint、livereload、hot module replacement及相关的插件
+    │    ├── webpack.prod.js  webpack生产配置，主要是代码的压缩混淆，图片压缩，加hash
+    │    └── karma.conf.js  测试配置
+    │   
+    ├── src/   开发目录
+    │     ├── components/   组件
+    │     └── pages/        页面（页面下的项目目录需要遵循一定的规范以便创建webpack的入口文件，不过这些规范是可以调整的；以下只是推荐）
+    │           └── index/   首页
+    │                ├── images/  图片资源
+    │                ├── page.css 样式文件，文件名称可以按照自己意愿命名
+    │                ├── page.js  脚本文件及webpack的入口文件，文件名称可以在/conf/index.js配置
+    │                └── template.html 模板文件及要撰写的html文件，文件名称可以在/conf/index.js配置
+    │                
+    │              
+    ├── dist/      自动生成
+    │      
+    ├── test/      测试（目录可以意愿来创建，但是测试文件名称必须遵循*_test.js的命名规范，可在/conf/karma.conf.js修改配置）
+    │  
+    ├── node_modules/     自动生成，包含node依赖以及开发依赖
+    │  
+    ├── static/           库文件等，不会被webpack的loader处理,手动管理
+    │     
+    └── etc
+    
+    ```
+-------------------------------------------------------------------------------------------
+## React加载图片
+### 在React中引入图片
+在react组件里的src：
+```
+<img src={require('../../images/test2.png')} alt=""/>
+```
+在css里的图片引用：
+
+```
+background: url("images/test3.png") 0 0 no-repeat;
+
+``
+
 
