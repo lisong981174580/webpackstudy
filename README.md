@@ -1599,9 +1599,4 @@ module.exports = {
     ├── static/           库文件等，不会被webpack的loader处理,手动管理
     │     
     └── etc
-    
-    ```
-
-
-
-
+``    
