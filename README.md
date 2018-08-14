@@ -1298,3 +1298,125 @@ package.json
 }
 ```
 --------------------------------------------------------------------
+## 开发环境配置
+### 目录结构
+```
+/
+ ├── dist/ 自动生成
+ │
+ ├── src/ 开发目录
+ │      ├── components/ 组件
+ │      ├── pages/ 页面
+ │      ├── index.jsx
+ │
+ ├── conf/ 工程配置
+ │
+ ├── test/ 测试
+ │
+ ├── docs/ 项目文档
+ │
+ ├── static/ 库文件等，不会被webpack的loader处理,手动管理
+ │
+ ├── node_modules/ 自动生成，包含.Node 依赖以及开发依赖
+ │
+ ├── package.json 项目配置文件
+ │
+ ├── webpack.config.js webpack开发环境配置文件
+ │
+ ├── webpack.production.config.js webpack生产环境配置文件
+ │
+ └── README.md 项目说明
+ 
+ ```
+### webpack.config.js
+React项目基于webpack开发环境配置示例：
+```
+var webpack = require('webpack');
+var path = require('path');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var OpenBrowserPlugin = require('open-browser-webpack-plugin');
+module.exports = {
+    entry:'./src/index.jsx',
+    output: {
+        path: path.resolve(__dirname,'/dist'),
+        filename: "[name].js"
+    },
+    module:{
+        rules:[
+            //.css 文件  style-loader css-loader postcss-loader
+            {
+                test:/\.css$/,
+                loader:"style-loader!css-loader!postcss-loader"
+            },
+            //.less文件  less less-loader postcss-loader
+            {
+                test:/\.less$/,
+                loader:"style-loader!css-loader!postcss-loader!less-loader"
+            },
+            //.jsx文件 babel-core babel-loader babel-preset-env babel-preset-react
+            {
+                test:/\.jsx?$/,
+                exclude:/node_modules/,
+                loader:"babel-loader"
+            },
+            {
+                test: /\.(png|jpg|gif|jpeg|bmp)$/,
+                loader: 'url-loader?limit=10000'
+            },
+            {
+                test:/\.(woff|woff2|svg|ttf|eot)($|\?)/i,
+                loader:'url-loader?limit=500000'
+            }
+        ]
+    },
+    plugins:[
+        new webpack.ProvidePlugin({
+            "React": "react",
+            "ReactDOM":'react-dom'
+        }),
+        new webpack.BannerPlugin("Copyright Nico inc."),
+        new HtmlWebpackPlugin({
+            filename:"./index.html",
+            template:"src/index.tmpl.html",
+            hash:true
+        }),
+        new OpenBrowserPlugin({
+            url: 'http://localhost:8080'
+        }),
+        new webpack.HotModuleReplacementPlugin()
+    ],
+    devServer:{
+        contentBase: "./",
+        inline: true,//实时刷新
+        port:8080,
+        compress:true,
+        hot: true,
+        proxy: {
+          "/api.php": "http://localhost/mh"
+        }
+    }
+}
+```
+### postcss.config.js
+自动为CSS3属性添加前缀：
+```
+module.exports = {
+    plugins: [
+        require('autoprefixer')
+    ]
+}
+
+```
+.babelrc
+```
+{
+    "presets":["env","react"]
+}
+
+```
+
+
+
+
+
+
