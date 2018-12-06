@@ -367,8 +367,8 @@ output: {
     }
     
  ```
- | 参数  | 描述  |
-| --- | --- | --- | 
+| 参数  | 描述  |
+| --- | --- | 
 | path  | 打包文件存放的绝对路径,默认值 ./dist  |  
 | publicPath  |用于在生产模式下更新内嵌到css、html文件里的url值  |
 | filename  |打包后的文件名|
@@ -385,7 +385,7 @@ output: {
 > Webpack 本身只能处理 JavaScript 模块，如果要处理其他类型的文件，就需要使用 loader 进行转换。
 
  | type  | url  |
-| --- | --- | --- | 
+| --- | --- | 
 | Loaders  | https://doc.webpack-china.org/loaders/ |  
 
 Loader 可以理解为是模块和资源的转换器，它本身是一个函数，接受源文件作为参数，返回转换的结果。这样，我们就可以通过 require 来加载任何类型的模块或文件，比如 CoffeeScript、 JSX、 LESS 或图片。
